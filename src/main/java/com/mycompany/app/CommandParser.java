@@ -37,8 +37,10 @@ public class CommandParser {
             Element element = (Element)commands.item(i);
             String name = element.getTextContent();
             String successContains = element.getAttribute("successContains");
+            String extractWordAfter = element.getAttribute("extractWordAfter");
+            String[] args = element.getAttribute("args").split(";");
 
-            this.commands.put(name, new CommandProps(successContains));
+            this.commands.put(name, new CommandProps(successContains, extractWordAfter, args));
         }
 
         for (int i = 0; i < errors.getLength(); i++) {
@@ -57,7 +59,7 @@ public class CommandParser {
         
         CommandProps commandProps = this.commands.get(command);
 
-        while(true && !commandProps.getSuccessMsg().isEmpty()) {
+        while(true && !commandProps.successContains.isEmpty()) {
             String line = reader.readLine();
 
             // check for errors
@@ -66,22 +68,24 @@ public class CommandParser {
                 break;
             }
 
-            if (line.contains(commandProps.getSuccessMsg())) {
+            if (line.contains(commandProps.successContains)) {
                 System.out.println(command + " " + line);
                 break; 
             }
         }
     }
 
+
+
     class CommandProps {
         private final String successContains;
+        private final String extractWordAfter;
+        private final String[] args;
 
-        CommandProps(String successContains) {
+        CommandProps(String successContains, String extractWordAfter, String[] args) {
             this.successContains = successContains;
-        }
-
-        public String getSuccessMsg() {
-            return this.successContains;
+            this.extractWordAfter = extractWordAfter;
+            this.args = args;
         }
     }
     
