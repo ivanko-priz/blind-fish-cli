@@ -64,11 +64,13 @@ public class CommandParser {
     }
 
     public void parseEngineResponse(BufferedReader reader, String command) throws IOException, InterruptedException, ExecutionException, TimeoutException {
-        if (!this.commands.containsKey(this.stripArgs(command))) {
+        String strippedCommand = this.stripArgs(command);
+
+        if (!this.commands.containsKey(strippedCommand)) {
             throw new IllegalArgumentException("Engine command: (" + command + ") not recognized");
         }
         
-        CommandProps commandProps = this.commands.get(command);
+        CommandProps commandProps = this.commands.get(strippedCommand);
 
         while(true && !commandProps.successContains.isEmpty()) {
             String line = reader.readLine();
