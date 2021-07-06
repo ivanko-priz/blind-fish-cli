@@ -1,6 +1,7 @@
 package com.mycompany.app;
 
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -52,8 +53,18 @@ public class CommandParser {
 
     }
 
+    private String stripArgs(String command) {
+        Optional<String> strippedCommand = this.commands
+            .entrySet()
+            .stream()
+            .filter(entry -> command.startsWith(entry.getKey()))
+            .map(entry -> entry.getKey()).findFirst();
+
+        return strippedCommand.isPresent() ? strippedCommand.get() : "";
+    }
+
     public void parseEngineResponse(BufferedReader reader, String command) throws IOException, InterruptedException, ExecutionException, TimeoutException {
-        if (!this.commands.containsKey(command)) {
+        if (!this.commands.containsKey(this.stripArgs(command))) {
             throw new IllegalArgumentException("Engine command: (" + command + ") not recognized");
         }
         
@@ -74,8 +85,6 @@ public class CommandParser {
             }
         }
     }
-
-
 
     class CommandProps {
         private final String successContains;
