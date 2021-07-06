@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<engine>
+    <commands>
+        <command successContains="uciok">uci</command>
+        <command>ucinewgame</command>
+        <command>position startpos</command>
+        <command successContains="readyok">isready</command>
+        <command successContains="currmove">go</command>
+        <command successContains="bestmove">stop</command>
+        <command>quit</command>
+    </commands>
+    <errors>
+        <error>Command not found</error>
+    </errors>
+</engine>
