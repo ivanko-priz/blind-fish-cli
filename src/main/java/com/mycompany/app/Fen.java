@@ -47,7 +47,7 @@ public class Fen {
         return this.fen;
     }
 
-    private void setFen(String fen) {
+    public void setFen(String fen) {
         this.fen = fen;
         String[] splitted = fen.split(" ");
         board = expandBoard();
