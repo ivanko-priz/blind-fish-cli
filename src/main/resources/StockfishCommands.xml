@@ -4,9 +4,10 @@
         <command successContains="uciok">uci</command>
         <command>ucinewgame</command>
         <command>position startpos</command>
+        <command args="fen">position</command>
         <command successContains="readyok">isready</command>
-        <command successContains="currmove">go</command>
-        <command successContains="bestmove">stop</command>
+        <command successContains="currmove" extractWordAfter="currmove" args="depth;movetime">go</command>
+        <command successContains="bestmove" extractWordAfter="bestmove">stop</command>
         <command>quit</command>
     </commands>
     <errors>
