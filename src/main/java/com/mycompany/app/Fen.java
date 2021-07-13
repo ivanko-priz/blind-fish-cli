@@ -335,8 +335,8 @@ public class Fen {
         String currPos = move.substring(0, 2);
         String dstPos = move.substring(2, 4);
 
-        int currPosId = (currPos.charAt(0) - 'a') + 8 * (8 - Character.getNumericValue(currPos.charAt(1))) + (1 * (currPos.charAt(0) - 'a'));
-        int dstPosId = (dstPos.charAt(0) - 'a') + 8 * (8 - Character.getNumericValue(dstPos.charAt(1))) + (1 * (dstPos.charAt(0) - 'a'));
+        int currPosId = (currPos.charAt(0) - 'a') + 8 * (8 - Character.getNumericValue(currPos.charAt(1))) + (1 * (8 - Character.getNumericValue(currPos.charAt(1))));
+        int dstPosId = (dstPos.charAt(0) - 'a') + 8 * (8 - Character.getNumericValue(dstPos.charAt(1))) + (1 * (8 - Character.getNumericValue(dstPos.charAt(1))));
 
         char[] board = this.board.toCharArray();
         char piece = board[currPosId];
