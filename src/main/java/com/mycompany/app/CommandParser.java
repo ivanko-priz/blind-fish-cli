@@ -58,7 +58,9 @@ public class CommandParser {
             .entrySet()
             .stream()
             .filter(entry -> command.startsWith(entry.getKey()))
-            .map(entry -> entry.getKey()).findFirst();
+            .map(entry -> entry.getKey())
+            .sorted((a, b) -> b.length() - a.length())
+            .findFirst();
 
         return strippedCommand.isPresent() ? strippedCommand.get() : "";
     }
