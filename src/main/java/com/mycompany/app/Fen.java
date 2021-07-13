@@ -102,17 +102,17 @@ public class Fen {
     private String packBoard(String expandedBoard) {
         return expandedBoard.chars()
             .mapToObj(Character::toString).reduce("", (packedBoard, square) -> {
-                if (square == "1") {
-                    char lastChar = packedBoard.charAt(packedBoard.length() - 1);
+                if (square.equals("1")) {
+                    char lastChar = packedBoard.length() == 0 ? '\0' : packedBoard.charAt(packedBoard.length() - 1);
 
                     if (Character.isDigit(lastChar)) {
                         char chars[] = packedBoard.toCharArray();
-                        chars[chars.length - 1] = lastChar++;
+                        chars[chars.length - 1] = ++lastChar;
 
-                        packedBoard = chars.toString();
+                        packedBoard = new String(chars);
+                    } else {
+                        packedBoard += "1";
                     }
-
-                    packedBoard += "1";
                 } else {
                     packedBoard += square;
                 }
