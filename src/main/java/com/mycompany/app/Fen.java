@@ -362,12 +362,11 @@ public class Fen {
         return new String(board);
     }
 
-    public void updateFen(String move) throws IllegalArgumentException, Exception {
+    private boolean validateMove(String move) throws IllegalArgumentException, Exception {
         if (!this.checkMoveSignature(move)) {
             throw new IllegalArgumentException("Wrong signature for move " + move);
         }
 
-        this.fenBuilder = new FenBuilder();
         char piece = findPiece(move);
 
         if (!Character.isLetter(piece)) {
@@ -380,6 +379,7 @@ public class Fen {
             throw new IllegalArgumentException("Invalid move: " + move);
         }
 
+        // if move signature is valid then update board and see if king is in check; if yes - throw
         String oldBoard = this.board;
         this.board = updateBoard(move);
 
@@ -388,6 +388,14 @@ public class Fen {
 
             throw new IllegalArgumentException("King is in check after move: " + move);
         }
+
+        return true;
+    }
+
+    public void updateFen(String move) throws IllegalArgumentException, Exception {
+        this.fenBuilder = new FenBuilder();
+
+        validateMove(move);
 
         if (this.fenBuilder.enPassant == null) this.fenBuilder.setEnPassant("-");
         if (this.fenBuilder.castling == null) this.fenBuilder.setCastling(this.castling);
