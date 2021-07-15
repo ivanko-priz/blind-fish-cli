@@ -9,12 +9,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SettingsHandler {
-    public static void createSettingsFile() throws IOException {        
-        Files.createDirectory(Path.of(Settings.DIR));
-        Files.createFile(Path.of(Settings.DIR, Settings.FILE));
+    private final static Path path = Path.of(Settings.DIR, Settings.FILE);
+
+    public static boolean exists() {
+        return Files.exists(path);
     }
 
-    public static Settings getSettingsFile(Path path) throws IOException, ClassNotFoundException {
+    public static void createSettingsFile() throws IOException {        
+        Files.createDirectory(Path.of(Settings.DIR));
+        Files.createFile(path);
+    }
+
+    public static Settings getSettingsFile() throws IOException, ClassNotFoundException {
         Settings settings;
 
         try(
@@ -31,7 +37,7 @@ public class SettingsHandler {
         return settings;
     }
 
-    public static void serializeSettings(Settings settings, Path path) throws IOException {
+    public static void serializeSettings(Settings settings) throws IOException {
         try(
             FileOutputStream fos = new FileOutputStream(path.toFile());
             ObjectOutputStream oos = new ObjectOutputStream(fos);
