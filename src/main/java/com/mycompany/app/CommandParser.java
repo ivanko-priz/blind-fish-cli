@@ -3,10 +3,10 @@ package com.mycompany.app;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.util.regex.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -21,7 +21,7 @@ public class CommandParser {
     private HashMap<String, CommandProps> commands;
     private ArrayList<String> errors;
 
-    CommandParser() throws ParserConfigurationException, SAXException, IOException {
+    public CommandParser() throws ParserConfigurationException, SAXException, IOException {
         this.commands = new HashMap<>();
         this.errors = new ArrayList<>();
 
@@ -50,7 +50,6 @@ public class CommandParser {
 
             this.errors.add(msg);
         }
-
     }
 
     private String stripArgs(String command) {
@@ -65,8 +64,9 @@ public class CommandParser {
         return strippedCommand.isPresent() ? strippedCommand.get() : "";
     }
 
-    public void parseEngineResponse(BufferedReader reader, String command) throws IOException, InterruptedException, ExecutionException, TimeoutException {
+    public CommandParserResponse parseEngineResponse(BufferedReader reader, String command) throws InternalError {
         String strippedCommand = this.stripArgs(command);
+        CommandParserResponse response = new CommandParserResponse(false);
 
         if (!this.commands.containsKey(strippedCommand)) {
             throw new IllegalArgumentException("Engine command: (" + command + ") not recognized");
@@ -74,20 +74,36 @@ public class CommandParser {
         
         CommandProps commandProps = this.commands.get(strippedCommand);
 
-        while(true && !commandProps.successContains.isEmpty()) {
-            String line = reader.readLine();
-
-            // check for errors
-            if (this.errors.stream().anyMatch(str -> line.contains(str))) {
-                System.out.println("Error executing command: " + command);
-                break;
+        try {
+            while(true && !commandProps.successContains.isEmpty()) {
+                String line = reader.readLine();
+                // System.out.println("reading: " + line);
+                // check for errors
+                if (this.errors.stream().anyMatch(str -> line.contains(str))) {
+                    response = new CommandParserResponse(true);
+                    // System.out.println("Error response: " + response);
+                    break;
+                }
+    
+                if (line.contains(commandProps.successContains)) {
+                    if (!commandProps.extractWordAfter.isEmpty()) {
+                        String regex = "(" + commandProps.extractWordAfter + "\\s)" + "(\\w+)";
+                        Pattern p = Pattern.compile(regex);
+                        Matcher m = p.matcher(line);
+    
+                        response = m.find() ? new CommandParserResponse(m.group(2), false) : new CommandParserResponse(true);
+                    } else {
+                        response = new CommandParserResponse(false);
+                    }
+    
+                    break;                  
+                }
             }
-
-            if (line.contains(commandProps.successContains)) {
-                System.out.println(command + " " + line);
-                break; 
-            }
+        } catch(IOException e) {
+            throw new InternalError("Internal error");
         }
+
+        return response;
     }
 
     class CommandProps {
@@ -100,6 +116,13 @@ public class CommandParser {
             this.extractWordAfter = extractWordAfter;
             this.args = args;
         }
-    }
-    
+
+        @Override
+        public String toString() {
+            return "successContans=" + this.successContains
+                + "; extractWordAfter=" + this.extractWordAfter
+                + "; args" + Arrays.toString(this.args);
+
+        }
+    }    
 }
