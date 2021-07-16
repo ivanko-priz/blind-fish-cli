@@ -17,7 +17,7 @@ public class Fen {
     private final String moveFormatMask;
     private final String pawnPromotionMask;
 
-    Fen() {    
+    public Fen() {    
         setFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w AHah -");
 
         fenBuilder = new FenBuilder();
@@ -362,7 +362,7 @@ public class Fen {
         return new String(board);
     }
 
-    private boolean validateMove(String move) throws IllegalArgumentException, Exception {
+    private boolean validateMove(String move) throws IllegalArgumentException {
         if (!this.checkMoveSignature(move)) {
             throw new IllegalArgumentException("Wrong signature for move " + move);
         }
@@ -392,7 +392,7 @@ public class Fen {
         return true;
     }
 
-    public void updateFen(String move) throws IllegalArgumentException, Exception {
+    public void updateFen(String move) throws IllegalArgumentException {
         this.fenBuilder = new FenBuilder();
 
         validateMove(move);
@@ -427,18 +427,18 @@ public class Fen {
             this.enPassant = enPassant;
         }
 
-        public String build() throws Exception {
+        public String build() throws InternalError {
             if (this.board == null) {
-                throw new Exception("FenBuilder: Board not set");
+                throw new InternalError("FenBuilder: Board not set");
             }
             if (this.sideToMove == null) {
-                throw new Exception("FenBuilder: Side to move not set");
+                throw new InternalError("FenBuilder: Side to move not set");
             }
             if (this.castling == null) {
-                throw new Exception("FenBuilder: Castling not set");
+                throw new InternalError("FenBuilder: Castling not set");
             }
             if (this.enPassant == null) {
-                throw new Exception("FenBuilder: En passant not set");
+                throw new InternalError("FenBuilder: En passant not set");
             }
 
             String fen = this.board + " " + this.sideToMove + " " + this.castling + " " + this.enPassant;
