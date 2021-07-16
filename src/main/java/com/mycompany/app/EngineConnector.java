@@ -32,24 +32,24 @@ public class EngineConnector {
         }
     }
 
-    public void sendCommand(String command) throws Exception {             
+    public CommandParserResponse sendCommand(String command) throws InternalError {              
+        CommandParserResponse response = new CommandParserResponse(true);
+        
         try {
             this.writer.write(command + "\n");
             this.writer.flush();
 
-            this.commandParser.parseEngineResponse(reader, command);
+            response = this.commandParser.parseEngineResponse(reader, command);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new InternalError("Internal error");
         }
 
+        return response;
     }
 
-
     public void stop() throws Exception {
-        System.out.println("Exiting stockfish");
         sendCommand("quit");
 
-        System.out.println("Destroying process");
         this.process.destroy();
     }
 }
