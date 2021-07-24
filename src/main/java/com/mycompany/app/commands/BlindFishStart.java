@@ -2,11 +2,14 @@ package com.mycompany.app.commands;
 
 import com.mycompany.app.Settings;
 import com.mycompany.app.SettingsHandler;
+import com.mycompany.app.chessboard.Fen;
+import com.mycompany.app.exceptions.IllegalMoveException;
+import com.mycompany.app.chessboard.Chessboard;
 import com.mycompany.app.EngineConnector;
-import com.mycompany.app.Fen;
 import com.mycompany.app.CommandParserResponse;
 
 import java.util.concurrent.Callable;
+import java.util.ArrayList;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,6 +28,7 @@ public class BlindFishStart implements Callable<Integer> {
 
     private EngineConnector engineConnector;
     private Fen fen;
+    private Chessboard chessboard;
     private Settings settings;
 
     BlindFishStart() {
@@ -32,7 +36,9 @@ public class BlindFishStart implements Callable<Integer> {
             this.settings = SettingsHandler.getSettingsFile();
             this.engineConnector = new EngineConnector(this.settings.getEngine());
             this.fen = new Fen();
+            this.chessboard = new Chessboard(new Fen().get());
         } catch (Exception e) {
+            e.printStackTrace();
             System.exit(1);
         }
     }
@@ -53,13 +59,6 @@ public class BlindFishStart implements Callable<Integer> {
         }
     }
 
-    private String wrapMove(String move) {
-        this.fen.updateFen(move);
-        String command = "position fen " + this.fen.get();
-
-        return command;
-    }
-
     private void processUserMoves() throws InternalError {
         try (
             InputStreamReader in = new InputStreamReader(System.in);
@@ -67,23 +66,31 @@ public class BlindFishStart implements Callable<Integer> {
         ) {
             String move;
             CommandParserResponse response;
+            ArrayList<String> moves = new ArrayList<>();
 
             while(!(move = br.readLine()).equals(this.QUIT)) {
                 try {
-                    String command = wrapMove(move);
-                    this.engineConnector.sendCommand(command);
-                    this.engineConnector.sendCommand("go");
-                    response = this.engineConnector.sendCommand("stop");
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                    continue;
-                }
+                    chessboard.updateChessboard(move);
+                    moves.add(move);
+                    
+                    // System.out.println(chessboard);
+                    String command = "position fen " + fen.get() + " moves " + moves.stream().reduce("", (a, m) -> a + m + " ");
+                    engineConnector.sendCommand(command);
+                    engineConnector.sendCommand("go");
 
-                if (!response.getError()) {
-                    this.fen.updateFen(response.getResponse());
-                    System.out.println(response.getResponse());
-                } else {
-                    throw new InternalError(INTERNAL_SERVER_ERROR);
+                    response = engineConnector.sendCommand("stop");
+                
+                    if (!response.getError()) {
+                        System.out.println(response.getResponse());
+                        chessboard.updateChessboard(response.getResponse());
+                        moves.add(move);
+                        // System.out.println(chessboard);
+                    } else {
+                        throw new InternalError(INTERNAL_SERVER_ERROR);
+                    }
+                } catch (IllegalMoveException e) {
+                    System.out.println("Illegal move: " + e.getMessage());
+                    continue;
                 }
             }
         } catch(IOException e) {
