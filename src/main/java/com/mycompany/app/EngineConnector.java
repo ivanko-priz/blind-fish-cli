@@ -1,23 +1,22 @@
 package com.mycompany.app;
 
 import java.lang.Process;
+import java.util.Optional;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
+
+import com.mycompany.app.uci.*;
 
 public class EngineConnector {
     private Process process;
     private BufferedReader reader;
     private OutputStreamWriter writer;
-    private final CommandParser commandParser;
     private final String path;
 
-    public EngineConnector(String path) throws ParserConfigurationException, SAXException, IOException {
+    public EngineConnector(String path) throws IOException {
         this.path = path;
-        this.commandParser = new CommandParser();
     }
 
     public boolean start() {
@@ -32,23 +31,16 @@ public class EngineConnector {
         }
     }
 
-    public CommandParserResponse sendCommand(String command) throws InternalError {              
-        CommandParserResponse response = new CommandParserResponse(true);
-        
-        try {
-            this.writer.write(command + "\n");
-            this.writer.flush();
+    public Optional<String> sendCommand(Command command) throws IOException {
+        command.send(writer);
 
-            response = this.commandParser.parseEngineResponse(reader, command);
-        } catch (IOException e) {
-            throw new InternalError("Internal error");
-        }
+        Optional<String> response = command.getResponse(reader);
 
         return response;
     }
 
     public void stop() throws Exception {
-        sendCommand("quit");
+        sendCommand(new Quit());
 
         this.process.destroy();
     }
