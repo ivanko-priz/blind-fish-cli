@@ -81,10 +81,9 @@ public class BlindFishStart implements Callable<Integer> {
                     response = engineConnector.sendCommand("stop");
                 
                     if (!response.getError()) {
-                        System.out.println(response.getResponse());
                         chessboard.updateChessboard(response.getResponse());
-                        moves.add(move);
-                        // System.out.println(chessboard);
+                        moves.add(response.getResponse());
+                        System.out.println(response.getResponse());
                     } else {
                         throw new InternalError(INTERNAL_SERVER_ERROR);
                     }
