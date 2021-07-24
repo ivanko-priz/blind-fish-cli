@@ -350,12 +350,18 @@ public class Chessboard {
         
         int[] vector = Piece.getMoveDirection(piece, currPosIds, dstPosIds);
         if (vector[0] != 0 || vector[1] != 0) {
-            if (!hasPiecesInBetween(move)) {
-                if (piece.isPawn() && Math.abs(vector[0]) == 2) {
-                    this.moveType = MoveType.PAWN_TWO_SQUARES;
-                } else {
-                    this.moveType = MoveType.REGULAR;
+            if (Piece.isPatternReccurent(piece)) {
+                if (!hasPiecesInBetween(move)) {
+                    if (piece.isPawn() && Math.abs(vector[0]) == 2) {
+                        this.moveType = MoveType.PAWN_TWO_SQUARES;
+                    } else {
+                        this.moveType = MoveType.REGULAR;
+                    }
+    
+                    return true;
                 }
+            } else {
+                this.moveType = MoveType.REGULAR;
 
                 return true;
             }
