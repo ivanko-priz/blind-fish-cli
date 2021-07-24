@@ -1,6 +1,8 @@
-package com.mycompany.app;
+package com.mycompany.chessboard;
 
 import static org.junit.Assert.assertEquals;
+
+import com.mycompany.app.chessboard.Fen;
 
 import org.junit.Test;
 

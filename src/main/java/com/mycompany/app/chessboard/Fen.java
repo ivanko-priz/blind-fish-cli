@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.mycompany.app.chessboard;
 
 import java.util.stream.IntStream;
 import java.util.Properties;
