@@ -352,16 +352,18 @@ public class Chessboard {
         if (vector[0] != 0 || vector[1] != 0) {
             if (Piece.isPatternReccurent(piece)) {
                 if (!hasPiecesInBetween(move)) {
-                    if (piece.isPawn() && Math.abs(vector[0]) == 2) {
-                        this.moveType = MoveType.PAWN_TWO_SQUARES;
-                    } else {
-                        this.moveType = MoveType.REGULAR;
-                    }
+                    this.moveType = MoveType.REGULAR;
     
                     return true;
                 }
             } else {
-                this.moveType = MoveType.REGULAR;
+                if (piece.isPawn() && Math.abs(vector[0]) == 2) {
+                    if (!hasPiecesInBetween(move)) {
+                        this.moveType = MoveType.PAWN_TWO_SQUARES;
+                    } else return false;
+                } else {
+                    this.moveType = MoveType.REGULAR;
+                }
 
                 return true;
             }
