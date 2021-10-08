@@ -24,10 +24,11 @@
       <artifactId>picocli</artifactId>
       <version>4.6.1</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/junit/junit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -117,6 +118,14 @@
           <version>3.0.0-M5</version>
           <configuration>
             <groups>ExceptionHandling</groups>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>11</source>
+            <target>11</target>
           </configuration>
         </plugin>
       </plugins>
